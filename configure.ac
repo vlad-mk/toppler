@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.13)
-AC_INIT([toppler],[1.1.6])
+AC_INIT([toppler],[1.1.7])
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE
@@ -31,18 +31,21 @@ AC_PROG_CC
 AC_PROG_LIBTOOL
 
 # Checks for libraries.
-SDL_VERSION=1.2.0
-AM_PATH_SDL($SDL_VERSION,
+SDL_VERSION=2.0.0
+AM_PATH_SDL2($SDL_VERSION,
 	AC_DEFINE_UNQUOTED(HAVE_SDL,[1],[Define to 1 if you have SDL.]),
 	AC_MSG_ERROR([*** SDL version $SDL_VERSION not found!]))
 CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
 LIBS="$LIBS $SDL_LIBS"
 
-AC_CHECK_LIB(SDL_mixer, main, ,
+AC_CHECK_LIB(SDL2_mixer, main, ,
 	AC_MSG_WARN([Can't find SDL_mixer. Toppler will have no sound.]))
 
 AC_CHECK_LIB(z, uncompress, ,
 	AC_MSG_ERROR([Can't find libz. Toppler needs it to uncompress the data file!]))
+
+AC_CHECK_LIB(X11, main, ,
+	AC_MSG_WARN([Can't find X11. Toppler will have no window aspect ratio by scaling.]))
 
 # Checks for header files.
 AC_HEADER_DIRENT

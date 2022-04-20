@@ -54,7 +54,7 @@
 #define HAVE_LIBINTL_H 1
 
 /* Define to 1 if you have the `SDL_mixer' library (-lSDL_mixer). */
-#define HAVE_LIBSDL_MIXER 1
+#define HAVE_LIBSDL2_MIXER 1
 
 /* Define to 1 if you have the `z' library (-lz). */
 #define HAVE_LIBZ 1
@@ -150,7 +150,7 @@
 #define PACKAGE_NAME "toppler"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "toppler 1.1.6"
+#define PACKAGE_STRING "toppler 1.1.7"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "toppler"
@@ -167,7 +167,7 @@
 /* Define to the URL of this package's homepage. */
 #define URL "http://toppler.sourceforge.net/"
 
-#define VERSION "1.1.6"
+#define VERSION "1.1.7"
 
 
 /* Define to empty if `const' does not conform to ANSI C. */

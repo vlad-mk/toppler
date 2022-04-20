@@ -35,6 +35,14 @@
 #include <math.h>
 #include <wchar.h>
 
+#if defined (__linux) && defined (HAVE_LIBX11)
+/* This is for constraining the aspect ratio of the window since SDL2 left us to die. */
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/Xos.h>
+#include <SDL_syswm.h> /* for SDL_GetWindowWMInfo() */
+#endif
+
 static SDL_Surface *display = 0;
 static SDL_Window  * ne_window = 0;
 static SDL_Texture * ne_texture = 0;
@@ -644,6 +652,9 @@ void scr_init(void) {
 
 }
 
+
+static void constrain_aspect_ratio_via_xlib(SDL_Window *window, int w, int h);
+
 void scr_reinit()
 {
 
@@ -653,14 +664,19 @@ void scr_reinit()
         ne_window = SDL_CreateWindow("Nebulous",
                                      SDL_WINDOWPOS_UNDEFINED,
                                      SDL_WINDOWPOS_UNDEFINED,
-                                     SCREENWID, SCREENHEI,
+                                     SCREENWID*3, SCREENHEI*3,
                                      flags);
+
+        SDL_SetWindowResizable(ne_window, SDL_TRUE);
 
         ne_renderer = SDL_CreateRenderer(ne_window, -1, SDL_RENDERER_PRESENTVSYNC);
 
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
         SDL_RenderSetLogicalSize(ne_renderer, SCREENWID, SCREENHEI);
 
+	constrain_aspect_ratio_via_xlib(ne_window, SCREENWID, SCREENHEI);
+
+        //SDL_RenderSetScale(ne_renderer, 2, 2);
 
 
         ne_texture = SDL_CreateTexture(ne_renderer,
@@ -1832,4 +1848,49 @@ void scr_draw_fish(long vert, long x, long number) {
 
 void scr_draw_torpedo(long vert, long x) {
   scr_blit(objectsprites.data(torb),(int)x, (int)vert);
+}
+
+
+//thanks to Scary Reasoner https://scaryreasoner.wordpress.com/
+static void constrain_aspect_ratio_via_xlib(SDL_Window *window, int w, int h)
+{
+#if defined (__linux) && defined (HAVE_LIBX11)
+        SDL_SysWMinfo info;
+        Display *display;
+        Window xwindow;
+        long supplied_return;
+        XSizeHints *hints;
+        Status s;
+
+        SDL_VERSION(&info.version);
+        if (!SDL_GetWindowWMInfo(window, &info)) {
+                fprintf(stderr, "SDL_GetWindowWMInfo failed.\n");
+                return;
+        }
+
+        if (info.subsystem != SDL_SYSWM_X11) {
+                fprintf(stderr, "Apparently not X11, no aspect ratio constraining for you!\n");
+                return;
+        }
+        display = info.info.x11.display;
+        xwindow = info.info.x11.window;
+        hints = XAllocSizeHints();
+        if (!hints) {
+                fprintf(stderr, "Failed to allocate size hints\n");
+                return;
+        }
+        s = XGetWMSizeHints(display, xwindow, hints, &supplied_return, XA_WM_SIZE_HINTS);
+        if (s) {
+                fprintf(stderr, "XGetWMSizeHints failed\n");
+                XFree(hints);
+                return;
+        }
+        hints->min_aspect.x = w;
+        hints->min_aspect.y = h;
+        hints->max_aspect.x = w;
+        hints->max_aspect.y = h;
+        hints->flags = PAspect;
+        XSetWMNormalHints(display, xwindow, hints);
+        XFree(hints);
+#endif
 }

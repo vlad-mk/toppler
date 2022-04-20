@@ -19,14 +19,14 @@
 #ifndef SOUNDSYS_H
 #define SOUNDSYS_H
 
-#ifdef HAVE_LIBSDL_MIXER
+#ifdef HAVE_LIBSDL2_MIXER
 #include "sdlinc.h"
 
 #else
 #define MIX_MAX_VOLUME 0
 #endif
 
-#ifdef HAVE_LIBSDL_MIXER
+#ifdef HAVE_LIBSDL2_MIXER
 struct ttsnddat {
   bool in_use; //is this datablock in use (sndfile is loaded)
   bool play;   //is this block goind to get played next time?
@@ -68,7 +68,7 @@ public:
 private:
   ttsounds(void);
 
-#ifdef HAVE_LIBSDL_MIXER
+#ifdef HAVE_LIBSDL2_MIXER
   /* this var is only true, if we the user wants sound, and wa
    * can init it
    */

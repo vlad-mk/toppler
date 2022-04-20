@@ -22,7 +22,7 @@
 #include "config.h"
 #include "soundsys.h"
 
-#ifdef HAVE_LIBSDL_MIXER
+#ifdef HAVE_LIBSDL2_MIXER
 #include "sdlinc.h"
 #endif
 
